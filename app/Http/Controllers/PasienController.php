@@ -10,7 +10,7 @@ class PasienController extends Controller
 {
     public function index()
     {
-        $pasiens = User::where('role', 'pasien')->with('poll')->get();
+        $pasiens = User::where('role', 'pasien')->get();
         return view('admin.pasien.index', compact('pasiens'));
     }
 

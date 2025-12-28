@@ -21,25 +21,34 @@
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th>Id</th>
+                                <th>No</th>
                                 <th>Nama Obat</th>
                                 <th>Kemasan</th>
+                                <th>Stok</th>
                                 <th>Harga</th>
-                                <th style="width: 150px;">Aksi</th>
+                                <th style="width: 320px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($obats as $obat )
                                 <tr>
-                                    <td>{{ $obat->id }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $obat->nama_obat }}</td>
                                     <td>{{ $obat->kemasan }}</td>
+                                    <td>{{ $obat->stok ?? 0 }}</td>
                                     <td>{{ number_format($obat->harga, 0, ',', '.') }}</td>
                                     <td>
+                                        <form action="{{ route('obat.addStock', $obat->id) }}" method="POST" style="display:inline-flex; gap:6px; align-items:center;">
+                                            @csrf
+                                            <input type="number" name="stok" min="1" class="form-control form-control-sm" style="width:80px" placeholder="Qty" required>
+                                            <button class="btn btn-sm btn-success" type="submit">Tambah Stok</button>
+                                        </form>
+
                                         <a href="{{ route('obat.edit', $obat->id) }}" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i>Edit
+                                            <i class="fas fa-edit"></i> Edit
                                         </a>
-                                        <form action="{{ route('obat.destroy', $obat->id) }}" method="POST" style="display: inline-block;">
+
+                                        <form action="{{ route('obat.destroy', $obat->id) }}" method="POST" style="display: inline-block; margin-left:6px;">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus obat ini ?')">
@@ -50,7 +59,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="text-center" colspan="7">
+                                    <td class="text-center" colspan="6">
                                         Belum ada Obat
                                     </td>
                                 </tr>

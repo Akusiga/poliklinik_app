@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 class ObatController extends Controller
 {
     public function index(){
-        $obats = Obat::all();
+        // order by id asc so the newest obat are listed last
+        $obats = Obat::orderBy('id', 'asc')->get();
         return view('admin.obat.index', compact('obats'));
     }
 
@@ -21,12 +22,14 @@ class ObatController extends Controller
             'nama_obat' => 'required|string',
             'kemasan' => 'required|string',
             'harga' => 'required|integer',
+            'stok' => 'nullable|integer|min:0',
         ]);
 
         Obat::create([
             'nama_obat' => $request->nama_obat,
             'kemasan' => $request->kemasan,
             'harga' => $request->harga,
+            'stok' => $request->stok ?? 0,
         ]);
 
         return redirect()->route('obat.index')
@@ -48,6 +51,7 @@ class ObatController extends Controller
             'nama_obat' => 'required|string',
             'kemasan' => 'nullable|string',
             'harga' => 'required|integer',
+            'stok' => 'nullable|integer|min:0',
         ]);
 
         $obat = Obat::findOrFail($id);
@@ -55,10 +59,27 @@ class ObatController extends Controller
             'nama_obat' => $request->nama_obat,
             'kemasan' => $request->kemasan,
             'harga' => $request->harga,
+            'stok' => $request->stok ?? $obat->stok,
         ]);
 
         return redirect()->route('obat.index')
             ->with('message', 'Data Obat berhasil di edit')
+            ->with('type', 'success');
+    }
+
+    /**
+     * Increment stock for an obat (admin action)
+     */
+    public function addStock(Request $request, Obat $obat)
+    {
+        $request->validate([
+            'stok' => 'required|integer|min:1',
+        ]);
+
+        $obat->increment('stok', $request->stok);
+
+        return redirect()->route('obat.index')
+            ->with('message', 'Stok berhasil ditambahkan')
             ->with('type', 'success');
     }
 
